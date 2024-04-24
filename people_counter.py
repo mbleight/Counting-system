@@ -2,7 +2,6 @@ from tracker.centroidtracker import CentroidTracker
 from tracker.trackableobject import TrackableObject
 from imutils.video import VideoStream
 from itertools import zip_longest
-from utils.mailer import Mailer
 from imutils.video import FPS
 from utils import thread
 import numpy as np
@@ -45,10 +44,6 @@ def parse_arguments():
         help="# of skip frames between detections")
     args = vars(ap.parse_args())
     return args
-
-def send_mail():
-	# function to send the email alerts
-	Mailer().send(config["Email_Receive"])
 
 def log_data(move_in, in_time, move_out, out_time):
 	# function to log the counting data
@@ -293,16 +288,6 @@ def people_counter():
 						date_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 						move_in.append(totalDown)
 						in_time.append(date_time)
-						# if the people limit exceeds over threshold, send an email alert
-						if sum(total) >= config["Threshold"]:
-							cv2.putText(frame, "-ALERT: People limit exceeded-", (10, frame.shape[0] - 80),
-								cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 255), 2)
-							if config["ALERT"]:
-								logger.info("Sending email alert..")
-								email_thread = threading.Thread(target = send_mail)
-								email_thread.daemon = True
-								email_thread.start()
-								logger.info("Alert sent!")
 						to.counted = True
 						# compute the sum of total people inside
 						total = []
